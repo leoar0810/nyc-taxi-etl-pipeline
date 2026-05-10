@@ -84,11 +84,37 @@ Para nulos: `passenger_count` default 1, `ratecode_id` default 99, `payment_type
 
 ```mermaid
 graph LR
-    A[NYC TLC Parquet/CSV] --> B[Raw]
-    B --> C[Trusted]
-    C --> D[KPIs Refined]
-    C --> E[Data Quality Report]
-    C --> F[Rechazados]
+    subgraph Fuentes
+        P[Parquet - NYC TLC]
+        Z[CSV - Zone Lookup]
+    end
+
+    subgraph Raw
+        RT[raw.yellow_taxi_trips]
+        RZ[raw.taxi_zone_lookup]
+    end
+
+    subgraph Trusted
+        TC[trusted.trips_clean]
+        TR[trusted.trips_rejected]
+    end
+
+    subgraph Refined
+        K1[kpi_demand_pattern]
+        K2[kpi_economic_efficiency]
+        K3[kpi_data_quality_impact]
+        DQ[data_quality_report]
+    end
+
+    P --> RT
+    Z --> RZ
+    RT --> TC
+    RZ --> TC
+    TC --> K1
+    TC --> K2
+    TR --> K3
+    TC --> DQ
+    RT -->|no pasa validacion| TR
 ```
 
 ## Stack
