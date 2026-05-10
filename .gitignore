@@ -1,0 +1,30 @@
+# Databricks
+.databricks/
+*.pyc
+__pycache__/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Datos temporales
+/tmp/
+*.parquet
+*.csv
+!docs/*.csv
+
+# Logs
+*.log
+
+# Bundle artifacts
+.bundle/
+
+# PDFs
+*.pdf

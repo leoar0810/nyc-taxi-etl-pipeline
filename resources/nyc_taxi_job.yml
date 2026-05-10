@@ -1,0 +1,71 @@
+# DAG:
+#   00_setup -> 01_raw -> 02_trusted -+-> 03_refined_kpis
+#                                     +-> 04_data_quality_report
+
+resources:
+  jobs:
+    nyc_taxi_etl_pipeline:
+      name: "[${bundle.target}] NYC Taxi ETL Pipeline - Medallion"
+      description: >
+        Pipeline ETL Medallion (Raw -> Trusted -> Refined)
+        para datos de taxis amarillos de NYC con Unity Catalog.
+      tags:
+        project: "nyc-taxi"
+        architecture: "medallion"
+        owner: "leonardoaguilera"
+
+      tasks:
+        - task_key: setup_unity_catalog
+          notebook_task:
+            notebook_path: /Workspace/Users/leoar0810@gmail.com/nyc-taxi-etl-pipeline/notebooks/00_setup_unity_catalog
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          timeout_seconds: 300
+
+        - task_key: raw_ingestion
+          depends_on:
+            - task_key: setup_unity_catalog
+          notebook_task:
+            notebook_path: /Workspace/Users/leoar0810@gmail.com/nyc-taxi-etl-pipeline/notebooks/01_raw_ingestion
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          timeout_seconds: 600
+          retry_on_timeout: true
+
+        - task_key: trusted_transformation
+          depends_on:
+            - task_key: raw_ingestion
+          notebook_task:
+            notebook_path: /Workspace/Users/leoar0810@gmail.com/nyc-taxi-etl-pipeline/notebooks/02_trusted_transformation
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          timeout_seconds: 900
+
+        - task_key: refined_kpis
+          depends_on:
+            - task_key: trusted_transformation
+          notebook_task:
+            notebook_path: /Workspace/Users/leoar0810@gmail.com/nyc-taxi-etl-pipeline/notebooks/03_refined_kpis
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          timeout_seconds: 600
+
+        - task_key: data_quality_report
+          depends_on:
+            - task_key: trusted_transformation
+          notebook_task:
+            notebook_path: /Workspace/Users/leoar0810@gmail.com/nyc-taxi-etl-pipeline/notebooks/04_data_quality_report
+            base_parameters:
+              catalog_name: ${var.catalog_name}
+          timeout_seconds: 600
+
+      schedule:
+        quartz_cron_expression: "0 0 6 1 * ?"  # dia 1 de cada mes a las 6 AM
+        timezone_id: "America/New_York"
+        pause_status: "PAUSED"
+
+      email_notifications:
+        on_failure:
+          - leoar0810@gmail.com
+
+      max_concurrent_runs: 1

@@ -1,0 +1,23 @@
+# databricks bundle deploy -t dev
+# databricks bundle run -t dev nyc_taxi_etl_pipeline
+
+bundle:
+  name: nyc-taxi-pipeline
+
+variables:
+  catalog_name:
+    description: "Catalogo en Unity Catalog"
+    default: "nyc_taxi_leonardoaguilera"
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    mode: production
+    variables:
+      catalog_name: "nyc_taxi_leonardoaguilera"
