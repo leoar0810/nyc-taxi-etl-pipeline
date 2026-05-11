@@ -54,6 +54,7 @@ Algunas reglas:
 - duracion entre 1 y 300 minutos
 - pasajeros <= 6
 - solo registros de enero 2023
+- ratio tarifa/distancia entre $1 y $100 por milla
 
 Para nulos: `passenger_count` default 1, `ratecode_id` default 99, `payment_type` default 0, surcharges default 0.0.
 
@@ -64,6 +65,10 @@ Para nulos: `passenger_count` default 1, `ratecode_id` default 99, `payment_type
 **KPI 2 - Eficiencia por zona** (`refined.kpi_economic_efficiency`): revenue por milla, velocidad promedio y ranking de zonas mas rentables.
 
 **KPI 3 - Impacto de calidad** (`refined.kpi_data_quality_impact`): porcentaje de registros descartados por regla y cuanto representan en ingresos perdidos.
+
+## Tasa de descarte
+
+Del total de ~3M registros, aproximadamente un 2.6% se rechaza por reglas de calidad. Las principales causas son distancia cero (cancelaciones o fallas de GPS) y tarifas invalidas (reembolsos o errores del taximetro). Los detalles por regla se encuentran en `refined.kpi_data_quality_impact`.
 
 ## Performance
 
@@ -119,7 +124,7 @@ graph LR
 
 ## Stack
 
-Databricks (Free Edition), PySpark, Delta Lake, Unity Catalog, Git/GitHub.
+Databricks (Free Edition), PySpark, Delta Lake, Unity Catalog, Databricks Asset Bundles, Git/GitHub.
 
 ---
 
